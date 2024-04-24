@@ -234,19 +234,6 @@ if [ -d "${ROCM_PATH}" ]; then
     BUILD_DIR="../build/linux/${ARCH}/rocm${ROCM_VARIANT}"
     EXTRA_LIBS="-L${ROCM_PATH}/lib -L/opt/amdgpu/lib/x86_64-linux-gnu/ -Wl,-rpath,\$ORIGIN/../../rocm/ -lhipblas -lrocblas -lamdhip64 -lrocsolver -lamd_comgr -lhsa-runtime64 -lrocsparse -ldrm -ldrm_amdgpu"
     build
-
-    # Record the ROCM dependencies
-    rm -f "${BUILD_DIR}/bin/deps.txt"
-    touch "${BUILD_DIR}/bin/deps.txt"
-    for dep in $(ldd "${BUILD_DIR}/bin/ollama_llama_server" | grep "=>" | cut -f2 -d= | cut -f2 -d' ' | grep -e rocm -e amdgpu -e libtinfo ); do
-        echo "${dep}" >> "${BUILD_DIR}/bin/deps.txt"
-    done
-    # bomb out if for some reason we didn't get a few deps
-    if [ $(cat "${BUILD_DIR}/bin/deps.txt" | wc -l ) -lt 8 ] ; then
-        cat "${BUILD_DIR}/bin/deps.txt"
-        echo "ERROR: deps file short"
-        exit 1
-    fi
     compress
 fi
 
